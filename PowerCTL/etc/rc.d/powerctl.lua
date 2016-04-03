@@ -8,6 +8,7 @@ local appconf = require("applicationconfparser")
 local event = require("event")
 local component = require("component")
 local colors = require("colors")
+local sides = require("sides")
 
 local config
 local timers = {}
@@ -69,7 +70,7 @@ local function setLine(line, value)
 
         local rs = component.redstone
 
-        rs.setBundledOutput("left", color, value)
+        rs.setBundledOutput(sides.left, color, value)
         linestate[line] = value
     end
 end
