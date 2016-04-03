@@ -7,6 +7,7 @@ local fs = require("filesystem")
 local appconf = require("applicationconfparser")
 local event = require("event")
 local component = require("component")
+local colors = require("colors")
 
 local config
 local timers = {}
@@ -19,8 +20,8 @@ local MODES ={
 
 
 local current_mode = 0
-local lowpowerpercent = 20
-local highpowerpercent = 90
+local linestate = {}
+
 
 local function loadconfig(filename)
     if(fs.exists(filename)) then
@@ -52,6 +53,7 @@ local function modemHandler(name, _, _, port, _, msg)
     if(tonumber(port) == 10) then
         local powerlevel, maxpowerlevel = string.match(msg,"PL=(%d+)|MPL=(%d+)")
 
+        --TODO: Update
         if((current_mode == MODES.NORMAL) and ((powerlevel/maxpowerlevel) * 100) < lowpowerpercent) then
             msg("Low power detected! Switching to bypass mode")
             setMode(MODES.BYPASS)
@@ -62,15 +64,35 @@ end
 local function setMode(mode, settings)
     msg("SETTING MODE:" .. tostring(mode), true)
 
+    local rs = component.redstone
+    
     if(mode == MODES.NORMAL) then
-        print("NORMAL MODE")
+        for k,v in pairs(config.general.mappings) do
+            msg("Setting Line to on: " .. k,true)
+            setLine(k, 255)
+        end    
     elseif(mode == MODES.BYPASS)
         print("BYPASS MODE")
     elseif(mode == MODES.OFFLINE)
-        print("OFFLINE MODE")
+        for k,v in pairs(config.general.mappings) do
+            msg("Setting Line to on: " .. k,true)
+            setLine(k, 0)
+        end  
     end
 end
 
+local function setLine(line, value)
+    if(line and value) then
+        line = string.lower(line)
+        local color = config.general.mappings[line]
+        if not color then return false end
+
+        local rs = component.redstone
+
+        rs.setBundledOutput("left", color, value)
+        linestate[line] = value
+    end
+end
 
 function mode(msg)
     if msg then
