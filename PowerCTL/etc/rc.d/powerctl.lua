@@ -34,9 +34,14 @@ local function isRunning()
 end
 
 local function powerpoll()
-    msg("Polling Power", true)
+    --msg("Polling Power", true)
 end
 
+local function modemHandler(name, _, _, port, _, msg)
+    if(tonumber(port) == 10) then
+        print(msg)
+    end
+end
 
 
 function start()
@@ -47,7 +52,10 @@ function start()
 
     config = loadconfig("/etc/powerctl.cfg")
 
-    timers.powerpoll = event.timer(config.general.pollrate, powerpoll, math.huge)
+    event.listen("modem_message", modemHandler)
+    component.modem.open(10)
+
+    --timers.powerpoll = event.timer(config.general.pollrate, powerpoll, math.huge)
     
 end
 
@@ -59,4 +67,6 @@ function stop()
     end
     event.cancel(timers.powerpoll)
     timers.powerpoll = nil
+
+    event.ignore("modem_message", modemHandler)
 end
