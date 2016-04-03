@@ -88,8 +88,12 @@ local function setMode(mode, settings)
             setLine(k, 0)
         end    
     elseif(mode == MODES.BYPASS) then
-        msg("BYPASS Mode activated!", true)
-        setLine(config.general.bypasscolor, 255)
+        for k,v in pairs(config.general.mappings) do
+            if(k:match("BYPASS")) then
+                msg("Setting Line to on: " .. k,true)
+                setLine(k, 255)
+            end
+        end  
     elseif(mode == MODES.OFFLINE) then
         for k,v in pairs(config.general.mappings) do
             msg("Setting Line to on: " .. k,true)
