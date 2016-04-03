@@ -70,7 +70,7 @@ local function setLine(line, value)
 
         local rs = component.redstone
 
-        rs.setBundledOutput(sides.left, color, value)
+        rs.setBundledOutput(sides.left, colors[color], value)
         linestate[line] = value
     end
 end
@@ -85,14 +85,15 @@ local function setMode(mode, settings)
     if(mode == MODES.NORMAL) then
         for k,v in pairs(config.general.mappings) do
             msg("Setting Line to on: " .. k,true)
-            setLine(k, 255)
+            setLine(k, 0)
         end    
     elseif(mode == MODES.BYPASS) then
-        print("BYPASS MODE")
+        msg("BYPASS Mode activated!", true)
+        setLine(config.general.bypasscolor, 255)
     elseif(mode == MODES.OFFLINE) then
         for k,v in pairs(config.general.mappings) do
             msg("Setting Line to on: " .. k,true)
-            setLine(k, 0)
+            setLine(k, 255)
         end  
     end
 end
