@@ -7,7 +7,7 @@ local appconf = require("applicationconfparser")
 local function loadconfig(filename)
 	if(fs.exists(filename)) then
 		local file = io.open(filename)
-		local config = appconf(file:read("*a"))
+		local config = appconf.parse(file:read("*a"))
 		file:close()
 
 		return config
