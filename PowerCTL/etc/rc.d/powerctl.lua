@@ -7,6 +7,10 @@ local fs = require("filesystem")
 local appconf = require("applicationconfparser")
 local event = require("event")
 
+local config
+local timers = {}
+
+
 local function loadconfig(filename)
 	if(fs.exists(filename)) then
 		local file = io.open(filename)
@@ -18,7 +22,7 @@ local function loadconfig(filename)
 end
 
 local function msg(msg, isDebug)
-	if((isDebug and debug and msg) then
+	if((isDebug and debug and msg)) then
 		print("POWERCTL-DEBUG: " .. msg)
 	elseif(not isDebug and msg) then
 		print("POWERCTL: " .. msg)
@@ -33,10 +37,6 @@ local function powerpoll()
 	msg("Polling Power", true)
 end
 
-
-
-local config
-local timers = {}
 
 
 function start()
