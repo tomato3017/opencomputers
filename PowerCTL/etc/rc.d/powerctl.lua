@@ -64,6 +64,8 @@ end
 local function setMode(mode, settings)
     msg("SETTING MODE:" .. tostring(mode), true)
 
+    if not config then config = loadconfig("/etc/powerctl.cfg") end
+
     local rs = component.redstone
     
     if(mode == MODES.NORMAL) then
