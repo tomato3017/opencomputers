@@ -61,6 +61,19 @@ local function modemHandler(name, _, _, port, _, msg)
     end
 end
 
+local function setLine(line, value)
+    if(line and value) then
+        line = string.lower(line)
+        local color = config.general.mappings[line]
+        if not color then return false end
+
+        local rs = component.redstone
+
+        rs.setBundledOutput("left", color, value)
+        linestate[line] = value
+    end
+end
+
 local function setMode(mode, settings)
     msg("SETTING MODE:" .. tostring(mode), true)
 
@@ -80,19 +93,6 @@ local function setMode(mode, settings)
             msg("Setting Line to on: " .. k,true)
             setLine(k, 0)
         end  
-    end
-end
-
-local function setLine(line, value)
-    if(line and value) then
-        line = string.lower(line)
-        local color = config.general.mappings[line]
-        if not color then return false end
-
-        local rs = component.redstone
-
-        rs.setBundledOutput("left", color, value)
-        linestate[line] = value
     end
 end
 
