@@ -71,9 +71,9 @@ local function setMode(mode, settings)
             msg("Setting Line to on: " .. k,true)
             setLine(k, 255)
         end    
-    elseif(mode == MODES.BYPASS)
+    elseif(mode == MODES.BYPASS) then
         print("BYPASS MODE")
-    elseif(mode == MODES.OFFLINE)
+    elseif(mode == MODES.OFFLINE) then
         for k,v in pairs(config.general.mappings) do
             msg("Setting Line to on: " .. k,true)
             setLine(k, 0)
@@ -99,8 +99,8 @@ function mode(msg)
         msg=string.upper(msg)
     end
 
-    if(mode and MODES[msg]) then
-        setMode(mode[msg])
+    if(msg and MODES[msg]) then
+        setMode(MODES[msg])
     end
 end
 
