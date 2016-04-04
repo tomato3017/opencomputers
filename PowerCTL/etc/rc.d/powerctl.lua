@@ -140,6 +140,7 @@ local function modemHandler(name, _, _, port, _, msg)
 
         if(config.general.automanage and powerlevel) then
             powerlevel, maxpowerlevel = tonumber(powerlevel), tonumber(maxpowerlevel)
+            if(debug) then msg("Current Power Level:" .. tostring((powerlevel/maxpowerlevel) * 100), true)
             if(current_mode == MODES.NORMAL) then
                 if((powerlevel/maxpowerlevel) * 100 < config.general.lowpowerpercent) then
                     setMode(MODES.CHARGING)
