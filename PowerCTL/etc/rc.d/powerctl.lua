@@ -76,7 +76,9 @@ local function modemHandler(name, _, _, port, _, msg)
 end
 
 local function processUDPMessage(_, source, port, msg)
+    local command, parameters = msg:match("^POWERCTL|.-|(.-)|(.*)")
 
+    --if(command == "")
 end
 
 local function setLine(line, value)
