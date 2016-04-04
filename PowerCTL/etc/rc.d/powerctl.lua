@@ -92,10 +92,12 @@ end
 local function processUDPMessage(_, source, port, message)
     local command, parameters = message:match("^POWERCTL|.-|(.-)|(.*)")
 
-    msg(message, true)
+    msg(command, true)
 
     if(command == "SETMODE") then
-        setMode(parameters)
+        if(#parameters > 0) then
+            setMode(MODES[parameters])
+        end
     end
 end
 
