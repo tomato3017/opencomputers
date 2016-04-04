@@ -113,14 +113,16 @@ local function setMode(mode, settings)
         for k,v in pairs(config.general.mappings) do
             msg("Setting Line to on: " .. k,true)
             setLine(k, 0)
-        end    
+        end
+        current_mode = mode
     elseif(mode == MODES.BYPASS) then
         for k,v in pairs(config.general.mappings) do
             if(k:match("bypass")) then
                 msg("Setting Line to on: " .. k,true)
                 setLine(k, 255)
             end
-        end  
+        end
+        current_mode = mode
     elseif(mode == MODES.OFFLINE) then
         for k,v in pairs(config.general.mappings) do
             msg("Setting Line to on: " .. k,true)
@@ -130,7 +132,31 @@ local function setMode(mode, settings)
                 setLine(k, 255)
             end
         end  
+        current_mode = mode
     end
+end
+
+local function getState()
+    local state = {}
+
+    for k,v in pairs(MODES) do
+        if(v == current_mode) then
+            state.current_mode = k
+        end
+    end
+
+    state.mappings = {}
+
+    for k,v in pairs(linestate) do
+        state.mappings[k] = v
+    end
+
+    return state
+end
+
+local function sendStateMsg()
+
+
 end
 
 local function processUDPMessage(_, source, port, message)
@@ -173,6 +199,10 @@ function start()
     network.udp.open(config.general.listenport)
     event.listen("datagram", processUDPMessage)
     
+    print(state.current_mode)
+    for k,v in pairs(state.mappings) do
+        print(k,v)
+    end
 end
 
 
