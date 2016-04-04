@@ -52,13 +52,13 @@ end
 
 
 
-function start( msg )
+function start( message )
     msg("Daemon Starting!")
     event.listen("datagram", processUDPMessage)
     msg("Done!")
 end
 
-function stop( msg )
+function stop( message )
     msg("Daemon Stopping")
     event.ignore("datagram", processUDPMessage)
     msg("Done!")
