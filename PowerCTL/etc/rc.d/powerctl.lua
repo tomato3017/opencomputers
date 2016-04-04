@@ -89,18 +89,6 @@ local function modemHandler(name, _, _, port, _, msg)
     end
 end
 
-local function processUDPMessage(_, source, port, message)
-    local command, parameters = message:match("^POWERCTL|.-|(.-)|(.*)")
-
-    msg(command, true)
-
-    if(command == "SETMODE") then
-        if(#parameters > 0) then
-            setMode(MODES[parameters])
-        end
-    end
-end
-
 local function setLine(line, value)
     if(line and value) then
         line = string.lower(line)
@@ -142,6 +130,18 @@ local function setMode(mode, settings)
                 setLine(k, 255)
             end
         end  
+    end
+end
+
+local function processUDPMessage(_, source, port, message)
+    local command, parameters = message:match("^POWERCTL|.-|(.-)|(.*)")
+
+    msg(command, true)
+
+    if(command == "SETMODE") then
+        if(#parameters > 0) then
+            setMode(MODES[parameters])
+        end
     end
 end
 
