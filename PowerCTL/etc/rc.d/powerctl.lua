@@ -5,6 +5,20 @@
 --HEADER|VERSION|COMMAND|K_VPairs
 --ex: "POWERCTL|1|VARUPDATE|MPL=10000;PL=1000"
 
+--Commands
+--[[
+    --Outbound
+    VARUPDATE: Sends updates on power levels
+        kvpairs of power and max power(PL and MPL)
+    STATE: Sends current mode and state 
+        CurrentState|kvpairs of mappings;
+
+    --Inbound
+    SETMODE:
+        parameters:
+            MODE_Name - String
+]]
+
 local debug = true
 local VERSION = "1"
 local HEADER = "POWERCTL|" .. VERSION
@@ -78,7 +92,9 @@ end
 local function processUDPMessage(_, source, port, msg)
     local command, parameters = msg:match("^POWERCTL|.-|(.-)|(.*)")
 
-    --if(command == "")
+    if(command == "SETMODE") then
+        setMode(parameters)
+    end
 end
 
 local function setLine(line, value)
@@ -167,5 +183,5 @@ function stop()
     event.ignore("modem_message", modemHandler)
     network.udp.close(config.general.listenport)
 
-    event.ignore("datagram" processUDPMessage)
+    event.ignore("datagram", processUDPMessage)
 end
