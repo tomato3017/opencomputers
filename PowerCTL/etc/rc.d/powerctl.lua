@@ -19,7 +19,7 @@
             MODE_Name - String
 ]]
 
-local debug = true
+local debug = false
 local VERSION = "1"
 local HEADER = "POWERCTL|" .. VERSION
 
@@ -207,6 +207,9 @@ function start()
     event.listen("datagram", processUDPMessage)
     
     timers.statesend = event.timer(config.general.statesendrate, sendStateMsg, math.huge)
+
+    --let the server know we are here
+    sendStateMsg()
 end
 
 
