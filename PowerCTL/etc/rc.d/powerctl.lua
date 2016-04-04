@@ -1,7 +1,13 @@
 --PowerCTL controller
 --By tomato3017
 
+--PowerCTL network format
+--HEADER|VERSION|COMMAND|K_VPairs
+--ex: "POWERCTL|1|VARUPDATE|MPL=10000;PL=1000"
+
 local debug = true
+local VERSION = "1"
+local HEADER = "POWERCTL|" .. VERSION
 
 local fs = require("filesystem")
 local appconf = require("applicationconfparser")
@@ -9,6 +15,7 @@ local event = require("event")
 local component = require("component")
 local colors = require("colors")
 local sides = require("sides")
+local network = require("network")
 
 local config
 local timers = {}
@@ -22,6 +29,15 @@ local MODES ={
 
 local current_mode = 0
 local linestate = {}
+
+
+
+local function sendMsgToServer(command, msg)
+    local serveraddr = config.general.serveraddr
+    local serverport = config.general.serverport
+
+    network.udp.send(serveraddr, serverport, HEADER .. "|" .. command .. "|" .. msg)
+end
 
 
 local function loadconfig(filename)
@@ -54,12 +70,13 @@ local function modemHandler(name, _, _, port, _, msg)
     if(tonumber(port) == 10) then
         local powerlevel, maxpowerlevel = string.match(msg,"PL=(%d+)|MPL=(%d+)")
 
-        --TODO: Update
-        if((current_mode == MODES.NORMAL) and ((powerlevel/maxpowerlevel) * 100) < lowpowerpercent) then
-            msg("Low power detected! Switching to bypass mode")
-            setMode(MODES.BYPASS)
-        end
+        --Forward the data to the server
+        sendMsgToServer("VARUPDATE", "PL=" .. powerlevel .. ";" .. "MPL=" .. maxpowerlevel)
     end
+end
+
+local function processUDPMessage(_, source, port, msg)
+
 end
 
 local function setLine(line, value)
@@ -130,6 +147,9 @@ function start()
 
     setMode(MODES.NORMAL)
     timers.powerpoll = event.timer(config.general.pollrate, powerpoll, math.huge)
+
+    network.udp.open(config.general.listenport)
+    event.listen("datagram", processUDPMessage)
     
 end
 
@@ -143,4 +163,7 @@ function stop()
     timers.powerpoll = nil
 
     event.ignore("modem_message", modemHandler)
+    network.udp.close(config.general.listenport)
+
+    event.ignore("datagram" processUDPMessage)
 end
