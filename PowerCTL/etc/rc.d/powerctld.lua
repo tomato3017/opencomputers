@@ -54,12 +54,17 @@ end
 
 function start( message )
     msg("Daemon Starting!")
+    
     event.listen("datagram", processUDPMessage)
+
+    --==PORT OPEN==
+    network.udp.open(16000)
     msg("Done!")
 end
 
 function stop( message )
     msg("Daemon Stopping")
     event.ignore("datagram", processUDPMessage)
+    network.udp.close(16000)
     msg("Done!")
 end
