@@ -131,16 +131,16 @@ local function setMode(mode, settings)
     end
 end
 
-local function modemHandler(name, _, _, port, _, msg)
+local function modemHandler(name, _, _, port, _, message)
     if(tonumber(port) == 10) then
-        local powerlevel, maxpowerlevel = string.match(msg,"PL=(%d+)|MPL=(%d+)")
+        local powerlevel, maxpowerlevel = string.match(message,"PL=(%d+)|MPL=(%d+)")
 
         --Forward the data to the server
         sendMsgToServer("VARUPDATE", "PL=" .. powerlevel .. ";" .. "MPL=" .. maxpowerlevel)
 
         if(config.general.automanage and powerlevel) then
             powerlevel, maxpowerlevel = tonumber(powerlevel), tonumber(maxpowerlevel)
-            if(debug) then msg("Current Power Level:" .. tostring((powerlevel/maxpowerlevel) * 100), true)
+            if(debug) then msg("Current Power Level:" .. tostring((powerlevel/maxpowerlevel) * 100), true) end
             if(current_mode == MODES.NORMAL) then
                 if((powerlevel/maxpowerlevel) * 100 < config.general.lowpowerpercent) then
                     setMode(MODES.CHARGING)
