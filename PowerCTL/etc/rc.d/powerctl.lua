@@ -89,8 +89,10 @@ local function modemHandler(name, _, _, port, _, msg)
     end
 end
 
-local function processUDPMessage(_, source, port, msg)
-    local command, parameters = msg:match("^POWERCTL|.-|(.-)|(.*)")
+local function processUDPMessage(_, source, port, message)
+    local command, parameters = message:match("^POWERCTL|.-|(.-)|(.*)")
+
+    msg(message, true)
 
     if(command == "SETMODE") then
         setMode(parameters)
