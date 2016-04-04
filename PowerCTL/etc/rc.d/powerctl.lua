@@ -37,7 +37,8 @@ local MODES ={
     ["NORMAL"] = 1,
     ["BYPASS"] = 2,
     ["OFFLINE"] = 3,
-    ["CUSTOM"] = 4
+    ["CUSTOM"] = 4,
+    ["CHARGING"] = 5
 }
 
 
@@ -80,28 +81,6 @@ local function powerpoll()
     --msg("Polling Power", true)
 end
 
-local function modemHandler(name, _, _, port, _, msg)
-    if(tonumber(port) == 10) then
-        local powerlevel, maxpowerlevel = string.match(msg,"PL=(%d+)|MPL=(%d+)")
-
-        --Forward the data to the server
-        sendMsgToServer("VARUPDATE", "PL=" .. powerlevel .. ";" .. "MPL=" .. maxpowerlevel)
-    end
-end
-
-local function setLine(line, value)
-    if(line and value) then
-        line = string.lower(line)
-        local color = config.general.mappings[line]
-        if not color then return false end
-
-        local rs = component.redstone
-
-        rs.setBundledOutput(sides.left, colors[color], value)
-        linestate[line] = value
-    end
-end
-
 local function setMode(mode, settings)
     msg("SETTING MODE:" .. tostring(mode), true)
 
@@ -126,13 +105,51 @@ local function setMode(mode, settings)
     elseif(mode == MODES.OFFLINE) then
         for k,v in pairs(config.general.mappings) do
             msg("Setting Line to on: " .. k,true)
-            if(k:match("bypass")) then
+            if(k:match("bypass") or k:match("chargeline")) then
                 setLine(k, 0)
             else
                 setLine(k, 255)
             end
         end  
         current_mode = mode
+    elseif(mode == MODES.CHARGING) then
+        setLine("chargeline", 255)
+        current_mode = mode
+    end
+end
+
+local function modemHandler(name, _, _, port, _, msg)
+    if(tonumber(port) == 10) then
+        local powerlevel, maxpowerlevel = string.match(msg,"PL=(%d+)|MPL=(%d+)")
+
+        --Forward the data to the server
+        sendMsgToServer("VARUPDATE", "PL=" .. powerlevel .. ";" .. "MPL=" .. maxpowerlevel)
+
+        if(config.general.automanage and powerlevel) then
+            powerlevel, maxpowerlevel = tonumber(powerlevel), tonumber(maxpowerlevel)
+            if(current_mode == MODES.NORMAL) then
+                if((powerlevel/maxpowerlevel) * 100 < config.general.lowpowerpercent) then
+                    setMode(MODES.CHARGING)
+                end
+            elseif(current_mode == MODES.CHARGING) then
+                if((powerlevel/maxpowerlevel) * 100 > config.general.highpowerpercent) then
+                    setMode(MODES.NORMAL)
+                end
+            end
+        end
+    end
+end
+
+local function setLine(line, value)
+    if(line and value) then
+        line = string.lower(line)
+        local color = config.general.mappings[line]
+        if not color then return false end
+
+        local rs = component.redstone
+
+        rs.setBundledOutput(sides.left, colors[color], value)
+        linestate[line] = value
     end
 end
 
