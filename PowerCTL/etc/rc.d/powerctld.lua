@@ -29,11 +29,11 @@ local event = require("event")
 local component = require("component")
 local network = require("network")
 
-local function msg(msg, isDebug)
-    if((isDebug and debug and msg)) then
-        print("POWERCTL-DEBUG: " .. msg)
-    elseif(not isDebug and msg) then
-        print("POWERCTL: " .. msg)
+local function msg(message, isDebug)
+    if((isDebug and debug and message)) then
+        print("POWERCTL-DEBUG: " .. message)
+    elseif(not isDebug and message) then
+        print("POWERCTL: " .. message)
     end
 end
 
