@@ -155,8 +155,15 @@ local function getState()
 end
 
 local function sendStateMsg()
+    local state = getState()
 
+    local mappingsStr = {}
 
+    for k,v in pairs(state.mappings) do
+        table.insert(mappingsStr, k.."="..v)
+    end
+
+    sendMsgToServer("STATE", state.current_mode .. "|" .. table.concat( mappingsStr,";") )
 end
 
 local function processUDPMessage(_, source, port, message)
@@ -199,10 +206,7 @@ function start()
     network.udp.open(config.general.listenport)
     event.listen("datagram", processUDPMessage)
     
-    print(state.current_mode)
-    for k,v in pairs(state.mappings) do
-        print(k,v)
-    end
+    timers.statesend = event.timer(config.general.statesendrate, sendStateMsg, math.huge)
 end
 
 
@@ -212,6 +216,7 @@ function stop()
         return
     end
     event.cancel(timers.powerpoll)
+    event.cancel(timers.statesend)
     timers.powerpoll = nil
 
     event.ignore("modem_message", modemHandler)
