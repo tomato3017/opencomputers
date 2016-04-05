@@ -77,23 +77,6 @@ local function isRunning()
     return not not timers.powerpoll
 end
 
-local function powerpoll()
-    if(config.general.powerpoller) then
-        local powerlevel = 0
-        local maxpowerlevel = 0
-
-        for addr, compType in component.list() do 
-            if(compType:match("mfe") or compType:match("mfsu")) then
-                local dev = component.proxy(addr)
-                powerlevel = powerlevel + dev.getEUStored()
-                maxpowerlevel = maxpowerlevel + dev.getEUCapacity()
-            end
-        end
-
-        print(powerlevel, maxpowerlevel)
-    end
-end
-
 local function setLine(line, value)
     if(line and value) then
         line = string.lower(line)
@@ -164,6 +147,27 @@ local function modemHandler(name, _, _, port, _, message)
                 end
             end
         end
+    end
+end
+
+local function powerpoll()
+    if(config.general.powerpoller) then
+        local powerlevel = 0
+        local maxpowerlevel = 0
+
+        for addr, compType in component.list() do 
+            if(compType:match("mfe") or compType:match("mfsu")) then
+                local dev = component.proxy(addr)
+                powerlevel = powerlevel + dev.getEUStored()
+                maxpowerlevel = maxpowerlevel + dev.getEUCapacity()
+            end
+        end
+
+        local cmdString = "PL=" .. powerlevel .. "|MPL=" .. maxpowerlevel
+
+        --hack, call the the modem handler
+
+        modemHandler("modem_message", nil, nil, 10, nil, cmdString)
     end
 end
 
