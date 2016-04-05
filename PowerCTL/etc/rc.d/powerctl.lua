@@ -78,7 +78,20 @@ local function isRunning()
 end
 
 local function powerpoll()
-    --msg("Polling Power", true)
+    if(config.general.powerpoller) then
+        local powerlevel = 0
+        local maxpowerlevel = 0
+
+        for addr, compType in component.list() do 
+            if(compType:match("mfe") or compType:match("mfsu")) then
+                local dev = component.proxy(addr)
+                powerlevel = powerlevel + dev.getEUStored()
+                maxpowerlevel = maxpowerlevel + dev.getEUCapacity()
+            end
+        end
+
+        print(powerlevel, maxpowerlevel)
+    end
 end
 
 local function setLine(line, value)
