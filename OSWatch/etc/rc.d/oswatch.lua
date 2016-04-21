@@ -45,7 +45,7 @@ local function watchdog_local()
         local freeMemory = computer.freeMemory()
         local maxMemory = computer.totalMemory()
 
-        if((freeMemory/maxMemory) * 100 > config.general.maxmemorypercent) then
+        if((freeMemory/maxMemory) * 100 < (100 - config.general.maxmemorypercent)) then
             currentState = STATE.REBOOT
             computer.pushSignal("oswatch_shutdown", true) --Bool is if rebooting
             event.timer(2, reboot_system, 1)
@@ -61,10 +61,17 @@ function start(msg)
 
         config = loadconfig("/etc/oswatch.cfg")
 
-        event.timer(config.general.pollrate, watchdog_local, math.huge)
+        watchdog_local_timer = event.timer(config.general.pollrate, watchdog_local, math.huge)
 
         currentState = STATE.NORMAL
     else
         print("OSWATCHDOG is already running!")
+    end
+end
+
+function stop(msg)
+    if(currentState == STATE.NORMAL) then
+        event.cancel(watchdog_local_timer)
+        print("OSWATCHDOG STOPPED!")
     end
 end
