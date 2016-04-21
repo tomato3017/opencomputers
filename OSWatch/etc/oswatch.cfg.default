@@ -1,0 +1,20 @@
+general {
+    #if true, the watchdog will monitor remote servers via network
+    remotewatch: false    
+
+    #Above this percent, the oswatch dog will reboot the machine
+    maxmemorypercent: 90
+
+    #How often to poll the system
+    pollrate: 5
+
+    #Same but for network
+    remotepollrate: 30
+
+    #Number of tries before the system is considered dead
+    remotetimeout: 3
+
+    remotemachines {
+        blah: "SomeAddressHere"
+    }
+}
