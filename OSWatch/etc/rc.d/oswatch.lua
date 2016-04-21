@@ -55,7 +55,7 @@ end
 
 function start(msg)
     if(currentState == STATE.OFFLINE) then
-        if(fs.exists("/etc/oswatch.cfg")) then
+        if(not fs.exists("/etc/oswatch.cfg")) then
             fs.copy("/etc/oswatch.cfg.default", "/etc/oswatch.cfg")
         end
 
