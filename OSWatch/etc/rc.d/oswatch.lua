@@ -19,6 +19,7 @@ local STATE = {
 }
 
 local currentState = STATE.OFFLINE
+local config
 
 local function loadconfig(filename)
     if(fs.exists(filename)) then
@@ -45,6 +46,7 @@ local function watchdog_local()
         local maxMemory = computer.totalMemory()
 
         if((freeMemory/maxMemory) * 100 > config.general.maxmemorypercent) then
+            currentState = STATE.REBOOT
             computer.pushSignal("oswatch_shutdown", true) --Bool is if rebooting
             event.timer(2, reboot_system, 1)
         end
@@ -57,7 +59,7 @@ function start(msg)
             fs.copy("/etc/oswatch.cfg.default", "/etc/oswatch.cfg")
         end
 
-        local config = loadconfig("/etc/oswatch.cfg")
+        config = loadconfig("/etc/oswatch.cfg")
 
         event.timer(config.general.pollrate, watchdog_local, math.huge)
 
