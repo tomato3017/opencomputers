@@ -40,7 +40,7 @@ function Logger.new(loggername, debuglevel, outputstream)
 	debuglevel = debuglevel or Logger.DEBUG_LEVELS.INFO
 
 	if(Logger.Loggers[loggername]) then
-		error("Logger Name is already taken")
+		return Logger.Loggers[loggername]
 	end
 
 
